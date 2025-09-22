@@ -9,7 +9,8 @@ import './MixerFader';
 
 @customElement('mixer-panel')
 export class MixerPanel extends LitElement {
-  static override styles = css`
+  // Fix: removed `override` modifier which was causing compilation errors.
+  static styles = css`
     :host {
       display: flex;
       flex-direction: column;
@@ -41,7 +42,8 @@ export class MixerPanel extends LitElement {
   @property({ type: Array }) prompts: Prompt[] = [];
   @property({ type: Number }) audioLevel = 0;
 
-  override render() {
+  // Fix: removed `override` modifier which was causing compilation errors.
+  render() {
     const group1 = this.prompts.slice(0, 5);
     const group2 = this.prompts.slice(5, 10);
 

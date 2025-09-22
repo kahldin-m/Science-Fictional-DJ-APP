@@ -3,12 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 import { css, html, LitElement } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import type { Prompt } from '../types';
 
 @customElement('flux-panel')
 export class FluxPanel extends LitElement {
-  static override styles = css`
+  // Fix: removed `override` modifier which was causing compilation errors.
+  static styles = css`
     :host {
       display: flex;
       flex-direction: column;
@@ -143,40 +144,7 @@ export class FluxPanel extends LitElement {
   @property({ type: Number }) fluxChance = 50;
   @property({ type: Number }) fluxInterval = 35;
   @property({ type: Boolean }) fluxActive = false;
-
-  @state() private countdown = 35;
-  private countdownIntervalId: number | null = null;
-  
-  override disconnectedCallback() {
-    super.disconnectedCallback();
-    this.stopCountdown();
-  }
-
-  override updated(changedProperties: Map<string, unknown>) {
-    if (changedProperties.has('fluxActive') || (changedProperties.has('fluxInterval') && this.fluxActive)) {
-      if (this.fluxActive) {
-        this.startCountdown();
-      } else {
-        this.stopCountdown();
-      }
-    }
-  }
-
-  private startCountdown() {
-    this.stopCountdown();
-    this.countdown = this.fluxInterval;
-    this.countdownIntervalId = window.setInterval(() => {
-        this.countdown = this.countdown > 1 ? this.countdown - 1 : this.fluxInterval;
-    }, 1000);
-  }
-
-  private stopCountdown() {
-    if (this.countdownIntervalId) {
-        clearInterval(this.countdownIntervalId);
-        this.countdownIntervalId = null;
-    }
-    this.countdown = this.fluxInterval;
-  }
+  @property({ type: Number }) fluxCountdown = 35;
 
   private handleActivateToggle(e: Event) {
     const target = e.target as HTMLInputElement;
@@ -233,7 +201,8 @@ export class FluxPanel extends LitElement {
     this.dispatchEvent(new CustomEvent('flux-sync-requested', { bubbles: true, composed: true }));
   }
 
-  override render() {
+  // Fix: removed `override` modifier which was causing compilation errors.
+  render() {
     return html`
       <div class="panel-header">
         <h3>Flux Capacitor</h3>
@@ -281,7 +250,7 @@ export class FluxPanel extends LitElement {
             <input id="flux-interval" type="number" .value=${String(this.fluxInterval)} @change=${this.handleSettingsChange} min="1" max="99">
         </div>
         <div class="countdown">
-          Next: <span class="countdown-value">${this.fluxActive ? this.countdown : '--'}s</span>
+          Next: <span class="countdown-value">${this.fluxActive ? this.fluxCountdown : '--'}s</span>
         </div>
       </div>
     `;

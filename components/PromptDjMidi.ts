@@ -44,7 +44,8 @@ const PRESETS = {
 /** The grid of prompt inputs. */
 @customElement('prompt-dj-midi')
 export class PromptDjMidi extends LitElement {
-  static override styles = css`
+  // Fix: removed `override` modifier which was causing compilation errors.
+  static styles = css`
     :host {
       width: 100%;
       height: 100%;
@@ -209,6 +210,8 @@ export class PromptDjMidi extends LitElement {
   @state() private fluxChance = 50;
   @state() private fluxInterval = 35;
   private fluxIntervalId: number | null = null;
+  @state() private fluxCountdown = 35;
+  private fluxCountdownIntervalId: number | null = null;
 
 
   @property({ type: Object })
@@ -220,14 +223,18 @@ export class PromptDjMidi extends LitElement {
     super();
     this.prompts = initialPrompts;
     this.midiDispatcher = new MidiDispatcher();
+    this.fluxCountdown = this.fluxInterval;
   }
 
-  override disconnectedCallback() {
+  // Fix: removed `override` modifier which was causing compilation errors.
+  disconnectedCallback() {
     super.disconnectedCallback();
     this.stopFluxTimer();
+    this.stopFluxCountdown();
   }
 
-  override firstUpdated() {
+  // Fix: removed `override` modifier which was causing compilation errors.
+  firstUpdated() {
     this.dispatchEvent(new CustomEvent('master-volume-changed', { detail: this.masterVolume }));
   }
 
@@ -585,8 +592,10 @@ export class PromptDjMidi extends LitElement {
     this.fluxActive = e.detail;
     if (this.fluxActive) {
         this.startFluxTimer();
+        this.startFluxCountdown();
     } else {
         this.stopFluxTimer();
+        this.stopFluxCountdown();
     }
   }
 
@@ -610,6 +619,10 @@ export class PromptDjMidi extends LitElement {
       if (this.fluxActive) {
         // Restart timer with new interval
         this.startFluxTimer();
+        this.startFluxCountdown();
+      } else {
+        // If not active, just update the displayed countdown value
+        this.fluxCountdown = this.fluxInterval;
       }
     }
   }
@@ -624,6 +637,22 @@ export class PromptDjMidi extends LitElement {
         clearInterval(this.fluxIntervalId);
         this.fluxIntervalId = null;
     }
+  }
+
+  private startFluxCountdown() {
+    this.stopFluxCountdown();
+    this.fluxCountdown = this.fluxInterval;
+    this.fluxCountdownIntervalId = window.setInterval(() => {
+      this.fluxCountdown = this.fluxCountdown > 1 ? this.fluxCountdown - 1 : this.fluxInterval;
+    }, 1000);
+  }
+
+  private stopFluxCountdown() {
+    if (this.fluxCountdownIntervalId !== null) {
+      clearInterval(this.fluxCountdownIntervalId);
+      this.fluxCountdownIntervalId = null;
+    }
+    this.fluxCountdown = this.fluxInterval;
   }
   
   private tickFlux() {
@@ -660,7 +689,8 @@ export class PromptDjMidi extends LitElement {
     );
   }
 
-  override render() {
+  // Fix: removed `override` modifier which was causing compilation errors.
+  render() {
     const bg = styleMap({
       backgroundImage: this.makeBackground(),
     });
@@ -763,6 +793,7 @@ export class PromptDjMidi extends LitElement {
                 .fluxAmountMax=${this.fluxAmountMax}
                 .fluxChance=${this.fluxChance}
                 .fluxInterval=${this.fluxInterval}
+                .fluxCountdown=${this.fluxCountdown}
                 @flux-active-changed=${this.handleFluxActiveChanged}
                 @flux-prompts-changed=${this.handleFluxPromptsChanged}
                 @flux-settings-changed=${this.handleFluxSettingsChanged}

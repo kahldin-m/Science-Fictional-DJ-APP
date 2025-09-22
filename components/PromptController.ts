@@ -16,7 +16,8 @@ import type { Prompt, ControlChange } from '../types';
 /** A single prompt input associated with a MIDI CC. */
 @customElement('prompt-controller')
 export class PromptController extends LitElement {
-  static override styles = css`
+  // Fix: removed `override` modifier which was causing compilation errors.
+  static styles = css`
     .prompt {
       width: 100%;
       display: flex;
@@ -142,7 +143,8 @@ export class PromptController extends LitElement {
 
   private lastValidText!: string;
 
-  override connectedCallback() {
+  // Fix: removed `override` modifier which was causing compilation errors.
+  connectedCallback() {
     super.connectedCallback();
     this.midiDispatcher?.addEventListener('cc-message', (e: Event) => {
       const customEvent = e as CustomEvent<ControlChange>;
@@ -159,7 +161,8 @@ export class PromptController extends LitElement {
     });
   }
 
-  override firstUpdated() {
+  // Fix: removed `override` modifier which was causing compilation errors.
+  firstUpdated() {
     // contenteditable is applied to textInput so we can "shrink-wrap" to text width
     // It's set here and not render() because Lit doesn't believe it's a valid attribute.
     this.textInput.setAttribute('contenteditable', 'plaintext-only');
@@ -169,7 +172,8 @@ export class PromptController extends LitElement {
     this.lastValidText = this.text;
   }
 
-  override update(changedProperties: Map<string, unknown>) {
+  // Fix: removed `override` modifier which was causing compilation errors.
+  update(changedProperties: Map<string, unknown>) {
     if (changedProperties.has('showCC') && !this.showCC) {
       this.learnMode = false;
     }
@@ -257,7 +261,8 @@ export class PromptController extends LitElement {
     );
   }
 
-  override render() {
+  // Fix: removed `override` modifier which was causing compilation errors.
+  render() {
     const classes = classMap({
       'prompt': true,
       'learn-mode': this.learnMode,
