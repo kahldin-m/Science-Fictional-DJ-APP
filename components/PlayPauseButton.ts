@@ -11,7 +11,6 @@ export class PlayPauseButton extends LitElement {
 
   @property({ type: String }) playbackState: PlaybackState = 'stopped';
 
-  // Fix: removed `override` modifier which was causing compilation errors.
   static styles = css`
     :host {
       position: relative;
@@ -178,8 +177,9 @@ export class PlayPauseButton extends LitElement {
     }
   }
 
-  // Fix: removed `override` modifier which was causing compilation errors.
-  render() {
+  // FIX: The 'override' keyword is required for lifecycle methods when extending LitElement 
+  // to ensure correct type inference and functionality.
+  override render() {
     return html`${this.renderSvg()}<div class="hitbox"></div>`;
   }
 }

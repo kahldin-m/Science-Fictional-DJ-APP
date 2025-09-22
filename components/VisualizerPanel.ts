@@ -8,7 +8,6 @@ import type { PlaybackState, Prompt } from '../types';
 
 @customElement('visualizer-panel')
 export class VisualizerPanel extends LitElement {
-  // Fix: removed `override` modifier which was causing compilation errors.
   static styles = css`
     :host {
       display: flex;
@@ -43,15 +42,17 @@ export class VisualizerPanel extends LitElement {
   private animationFrameId = 0;
   private startTime = 0;
 
-  // Fix: removed `override` modifier which was causing compilation errors.
-  connectedCallback() {
+  // FIX: The 'override' keyword is required for lifecycle methods when extending LitElement 
+  // to ensure correct type inference and functionality.
+  override connectedCallback() {
     super.connectedCallback();
     this.startTime = performance.now();
     this.runAnimationLoop();
   }
 
-  // Fix: removed `override` modifier which was causing compilation errors.
-  disconnectedCallback() {
+  // FIX: The 'override' keyword is required for lifecycle methods when extending LitElement 
+  // to ensure correct type inference and functionality.
+  override disconnectedCallback() {
     super.disconnectedCallback();
     cancelAnimationFrame(this.animationFrameId);
   }
@@ -134,8 +135,9 @@ export class VisualizerPanel extends LitElement {
   }
 
 
-  // Fix: removed `override` modifier which was causing compilation errors.
-  render() {
+  // FIX: The 'override' keyword is required for lifecycle methods when extending LitElement 
+  // to ensure correct type inference and functionality.
+  override render() {
     // Using clientWidth/Height for the viewBox ensures the SVG coordinates match
     // the actual pixel dimensions of the container.
     return html`

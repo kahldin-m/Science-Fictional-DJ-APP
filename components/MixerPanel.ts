@@ -9,7 +9,6 @@ import './MixerFader';
 
 @customElement('mixer-panel')
 export class MixerPanel extends LitElement {
-  // Fix: removed `override` modifier which was causing compilation errors.
   static styles = css`
     :host {
       display: flex;
@@ -42,8 +41,9 @@ export class MixerPanel extends LitElement {
   @property({ type: Array }) prompts: Prompt[] = [];
   @property({ type: Number }) audioLevel = 0;
 
-  // Fix: removed `override` modifier which was causing compilation errors.
-  render() {
+  // FIX: The 'override' keyword is required for lifecycle methods when extending LitElement 
+  // to ensure correct type inference and functionality.
+  override render() {
     const group1 = this.prompts.slice(0, 5);
     const group2 = this.prompts.slice(5, 10);
 

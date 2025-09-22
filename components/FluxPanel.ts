@@ -8,7 +8,6 @@ import type { Prompt } from '../types';
 
 @customElement('flux-panel')
 export class FluxPanel extends LitElement {
-  // Fix: removed `override` modifier which was causing compilation errors.
   static styles = css`
     :host {
       display: flex;
@@ -69,6 +68,9 @@ export class FluxPanel extends LitElement {
       display: flex;
       align-items: center;
       justify-content: center;
+      font-size: 2vmin;
+      line-height: 1;
+      padding-bottom: 0.2vmin;
     }
     .prompt-list {
       flex-grow: 1;
@@ -145,6 +147,7 @@ export class FluxPanel extends LitElement {
   @property({ type: Number }) fluxInterval = 35;
   @property({ type: Boolean }) fluxActive = false;
   @property({ type: Number }) fluxCountdown = 35;
+  @property({ type: Boolean }) isSyncActive = false;
 
   private handleActivateToggle(e: Event) {
     const target = e.target as HTMLInputElement;
@@ -201,8 +204,13 @@ export class FluxPanel extends LitElement {
     this.dispatchEvent(new CustomEvent('flux-sync-requested', { bubbles: true, composed: true }));
   }
 
-  // Fix: removed `override` modifier which was causing compilation errors.
-  render() {
+  // FIX: The 'override' keyword is required for lifecycle methods when extending LitElement 
+  // to ensure correct type inference and functionality.
+  override render() {
+    const syncTitle = this.isSyncActive
+        ? 'Remove all active instruments from Flux Group'
+        : 'Add all active instruments to Flux Group';
+
     return html`
       <div class="panel-header">
         <h3>Flux Capacitor</h3>
@@ -214,7 +222,7 @@ export class FluxPanel extends LitElement {
       
       <div class="prompt-list-header">
         <span>Flux Group</span>
-        <button class="sync-button" @click=${this.syncWithMix} title="Add all active instruments to Flux Group">+</button>
+        <button class="sync-button" @click=${this.syncWithMix} title=${syncTitle}>${this.isSyncActive ? '−' : '+'}</button>
       </div>
       <div class="prompt-list">
         ${this.prompts.map(prompt => html`

@@ -44,7 +44,6 @@ const PRESETS = {
 /** The grid of prompt inputs. */
 @customElement('prompt-dj-midi')
 export class PromptDjMidi extends LitElement {
-  // Fix: removed `override` modifier which was causing compilation errors.
   static styles = css`
     :host {
       width: 100%;
@@ -226,15 +225,17 @@ export class PromptDjMidi extends LitElement {
     this.fluxCountdown = this.fluxInterval;
   }
 
-  // Fix: removed `override` modifier which was causing compilation errors.
-  disconnectedCallback() {
+  // FIX: The 'override' keyword is required for lifecycle methods when extending LitElement 
+  // to ensure correct type inference and functionality.
+  override disconnectedCallback() {
     super.disconnectedCallback();
     this.stopFluxTimer();
     this.stopFluxCountdown();
   }
 
-  // Fix: removed `override` modifier which was causing compilation errors.
-  firstUpdated() {
+  // FIX: The 'override' keyword is required for lifecycle methods when extending LitElement 
+  // to ensure correct type inference and functionality.
+  override firstUpdated() {
     this.dispatchEvent(new CustomEvent('master-volume-changed', { detail: this.masterVolume }));
   }
 
@@ -605,7 +606,21 @@ export class PromptDjMidi extends LitElement {
   
   private handleFluxSync() {
     const activePromptIds = this.activePromptsList.map(p => p.promptId);
-    this.fluxPrompts = new Set(activePromptIds);
+    if (activePromptIds.length === 0) return;
+
+    const isSyncActive = activePromptIds.every(id => this.fluxPrompts.has(id));
+    
+    const newFluxPrompts = new Set(this.fluxPrompts);
+
+    if (isSyncActive) {
+      // Remove active prompts from flux group
+      activePromptIds.forEach(id => newFluxPrompts.delete(id));
+    } else {
+      // Add active prompts to flux group
+      activePromptIds.forEach(id => newFluxPrompts.add(id));
+    }
+
+    this.fluxPrompts = newFluxPrompts;
   }
 
   private handleFluxSettingsChanged(e: CustomEvent<{ amountMin: number; amountMax: number; chance: number; interval: number }>) {
@@ -689,13 +704,17 @@ export class PromptDjMidi extends LitElement {
     );
   }
 
-  // Fix: removed `override` modifier which was causing compilation errors.
-  render() {
+  // FIX: The 'override' keyword is required for lifecycle methods when extending LitElement 
+  // to ensure correct type inference and functionality.
+  override render() {
     const bg = styleMap({
       backgroundImage: this.makeBackground(),
     });
     const mixerPrompts = this.getMixerPrompts();
     const allPrompts = [...this.prompts.values()];
+
+    const activePromptIds = this.activePromptsList.map(p => p.promptId);
+    const isSyncActive = activePromptIds.length > 0 && activePromptIds.every(id => this.fluxPrompts.has(id));
 
     return html`<div id="background" style=${bg}></div>
       <div id="top-bar">
@@ -794,6 +813,7 @@ export class PromptDjMidi extends LitElement {
                 .fluxChance=${this.fluxChance}
                 .fluxInterval=${this.fluxInterval}
                 .fluxCountdown=${this.fluxCountdown}
+                .isSyncActive=${isSyncActive}
                 @flux-active-changed=${this.handleFluxActiveChanged}
                 @flux-prompts-changed=${this.handleFluxPromptsChanged}
                 @flux-settings-changed=${this.handleFluxSettingsChanged}

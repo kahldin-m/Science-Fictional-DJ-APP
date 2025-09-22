@@ -9,7 +9,6 @@ import type { Prompt } from '../types';
 
 @customElement('mixer-fader')
 export class MixerFader extends LitElement {
-  // Fix: removed `override` modifier which was causing compilation errors.
   static styles = css`
     :host {
       display: flex;
@@ -184,8 +183,9 @@ export class MixerFader extends LitElement {
     return abbreviated;
   }
 
-  // Fix: removed `override` modifier which was causing compilation errors.
-  render() {
+  // FIX: The 'override' keyword is required for lifecycle methods when extending LitElement 
+  // to ensure correct type inference and functionality.
+  override render() {
     if (!this.prompt) return html``;
 
     const vuStyle = styleMap({

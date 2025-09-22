@@ -8,7 +8,6 @@ import { classMap } from 'lit/directives/class-map.js';
 
 @customElement('toast-message')
 export class ToastMessage extends LitElement {
-  // Fix: removed `override` modifier which was causing compilation errors.
   static styles = css`
     .toast {
       line-height: 1.6;
@@ -60,8 +59,9 @@ export class ToastMessage extends LitElement {
     } );
   }
 
-  // Fix: removed `override` modifier which was causing compilation errors.
-  render() {
+  // FIX: The 'override' keyword is required for lifecycle methods when extending LitElement 
+  // to ensure correct type inference and functionality.
+  override render() {
     return html`<div class=${classMap({ showing: this.showing, toast: true })}>
       <div class="message">${this.renderMessageWithLinks()}</div>
       <button @click=${this.hide}>✕</button>
